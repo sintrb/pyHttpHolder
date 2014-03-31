@@ -16,7 +16,7 @@ def urlencode(param):
 	接受字符串和字典两种类型，字典类型在Encode之后键值对(key=value)之间用&连接，字符串直接Encode
 	'''
 	if type(param) is types.DictType:
-		return "&".join(("%s=%s" % (k, urllib2.quote(v)) for k, v in param.iteritems()))
+		return "&".join(("%s=%s" % (k, urllib2.quote(str(v))) for k, v in param.iteritems()))
 	else:
 		return urllib2.quote(param)
 
