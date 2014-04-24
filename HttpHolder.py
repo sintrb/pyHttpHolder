@@ -1,8 +1,14 @@
 # -*- coding: UTF-8 -*
 '''
+Modified on 2014-04-24
+@author: RobinTang
+@version: 1.1
+@change: 添加对请求超时的支持
+
 Created on 2013-10-14
 HTTP请求保持
 @author: RobinTang
+@version: 1.0
 '''
 
 import urllib2
@@ -63,22 +69,23 @@ class HttpHolder:
 	Http请求保持类
 	headers, 默认的请求头，一般可以把UA之类放这
 	'''
-	def __init__(self, headers=None):
+	def __init__(self, headers=None, timeout=None):
 		"""
 		创建一个Http请求保存实例
 		"""
 		self.headers = headers
 		self.cj = cookielib.CookieJar()
 		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cj))
-	def open(self, url, headers=None, data=None):
+		self.timeout = timeout
+	def open(self, url, headers=None, data=None, timeout=None):
 		"""
-		发送一个Http请求,返回Http响应对象
+		发送一个Http请求,返回Http响应文档对象，该文档对象会保留，可通过doc成员获取
 		"""
 		if type(data) is types.DictType:
 			data = urlencode(data)
 		
 		if self.headers and headers:
-			hd = dict(self.headers.items()+headers.items())
+			hd = dict(self.headers.items() + headers.items())
 		elif self.headers:
 			hd = self.headers
 		elif headers:
@@ -86,24 +93,32 @@ class HttpHolder:
 		else:
 			hd = {}
 		req = urllib2.Request(url, headers=hd)
-		self.doc = self.opener.open(req, data)
-		return self.doc
-	def open_raw(self, url, headers=None, data=None):
+		
+		if not timeout:
+			timeout = self.timeout
+		if not timeout:
+			doc = self.opener.open(req, data)
+		else:
+			doc = self.opener.open(req, data=data, timeout=self.timeout)
+		self.doc = doc
+		return doc
+	def open_raw(self, url, headers=None, data=None, timeout=None):
 		'''
 		原始的读取一个Http返回体
 		'''
-		self.open(url, headers, data)
-		return self.doc.read()
+		doc = self.open(url, headers, data, timeout)
+		return doc.read()
 	
-	def open_html(self, url, headers=None, data=None):
+	def open_html(self, url, headers=None, data=None, timeout=None):
 		'''
 		请求一个html文档（其实是请求文本类型）
 		'''
-		return get_html_by_urldoc(self.open(url, headers, data))
+		doc = self.open(url, headers, data, timeout)
+		return get_html_by_urldoc(doc)
 
 	def geturl(self):
 		'''
-		获取当前请求的响应url
+		获取当前请求的响应url，在HTTP请求得到重定向时可用该方法获取实际响应的URL，该方法在多线程时不安全
 		'''
 		return self.doc.geturl()
 	
@@ -125,15 +140,6 @@ class HttpHolder:
 		'''
 		return dict(((c.name, c.value) for c in self.cj))
 
-if __name__ == '__main__':
-	hd = HttpHolder()
-	hd.open_html('http://www.baidu.com/')
-	cks = hd.get_cookiesdict()
-	print cks
-	hd1 = HttpHolder()
-	hd1.set_cookiesdict(cks)
-	hd1.open_html('http://www.baidu.com/')
-	print hd1.get_cookiesdict()
-	
-	
+
+
 
