@@ -42,6 +42,14 @@ def get_html_by_urldoc(doc):
 		contype = 'application/x-www-form-urlencoded; charset=UTF-8'
 	charset = None
 	html = doc.read()
+	info = doc.info()
+	if ('Content-Encoding' in info and info['Content-Encoding'] == 'gzip') or ('content-encoding' in info and info['content-encoding'] == 'gzip'):
+		# gizp
+		import gzip
+		import StringIO
+		gz = gzip.GzipFile(fileobj=StringIO.StringIO(html))
+		html = gz.read()
+		gz.close()
 	chs = re.findall('charset\s*=\s*([^\s,^;]*)', contype)
 	if chs and len(chs) > 0:
 		charset = chs[0]
