@@ -6,9 +6,9 @@
 ## 使用举例
 * 直接来：
 ``` Python
+from HttpHolder import HttpHolder
 h = HttpHolder()
-print h.open_html('http://www.baidu.com')
-
+print h.open_html('http://www.baidu.com').encode('utf-8')
 ```
 
 * 稍微复杂点：
