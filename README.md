@@ -9,6 +9,8 @@
 from HttpHolder import HttpHolder
 h = HttpHolder()
 print h.open_html('http://www.baidu.com').encode('utf-8')
+# or
+print h.open_html('http://www.baidu.com')
 ```
 
 * 稍微复杂点：
