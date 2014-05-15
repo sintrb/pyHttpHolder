@@ -4,7 +4,14 @@
 
 
 ## 使用举例
-代码：
+直接来：
+``` Python
+h = HttpHolder()
+print h.open_html('http://www.baidu.com')
+
+```
+
+稍微复杂点：
 ``` Python
 headers = {
 	# Chrome User-Agent
