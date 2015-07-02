@@ -14,6 +14,10 @@ Created on 2013-10-14
 HTTP请求保持
 @author: RobinTang
 @version: 1.0
+
+
+https://github.com/sintrb/pyHttpHolder
+
 '''
 
 import urllib2
