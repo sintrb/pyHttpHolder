@@ -1,5 +1,10 @@
 # -*- coding: UTF-8 -*
 '''
+Modified on 2015-07-02
+@author: RobinTang
+@version: 1.2
+@change: 添加请求方法设置
+
 Modified on 2014-04-24
 @author: RobinTang
 @version: 1.1
@@ -85,7 +90,7 @@ class HttpHolder:
 		self.cj = cookielib.CookieJar()
 		self.opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(self.cj))
 		self.timeout = timeout
-	def open(self, url, headers=None, data=None, timeout=None):
+	def open(self, url, headers=None, data=None, timeout=None, method=None):
 		"""
 		发送一个Http请求,返回Http响应文档对象，该文档对象会保留，可通过doc成员获取
 		"""
@@ -101,7 +106,8 @@ class HttpHolder:
 		else:
 			hd = {}
 		req = urllib2.Request(url, headers=hd)
-		
+		if method:
+			req.get_method = lambda:method
 		if not timeout:
 			timeout = self.timeout
 		if not timeout:
@@ -110,18 +116,18 @@ class HttpHolder:
 			doc = self.opener.open(req, data=data, timeout=self.timeout)
 		self.doc = doc
 		return doc
-	def open_raw(self, url, headers=None, data=None, timeout=None):
+	def open_raw(self, url, headers=None, data=None, timeout=None, method=None):
 		'''
 		原始的读取一个Http返回体
 		'''
-		doc = self.open(url, headers, data, timeout)
+		doc = self.open(url, headers, data, timeout, method)
 		return doc.read()
 	
-	def open_html(self, url, headers=None, data=None, timeout=None):
+	def open_html(self, url, headers=None, data=None, timeout=None, method=None):
 		'''
 		请求一个html文档（其实是请求文本类型）
 		'''
-		doc = self.open(url, headers, data, timeout)
+		doc = self.open(url, headers, data, timeout, method)
 		return get_html_by_urldoc(doc)
 
 	def geturl(self):
